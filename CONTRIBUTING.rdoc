@@ -14,6 +14,7 @@ contributors to follow to reduce the time it takes to get changes merged in.
    * Match coding style (+if+, +elsif+, +when+ need trailing +then+)
 
 3. If any new files are added or existing files removed in a commit or PR, please update the +Manifest.txt+ accordingly.
+   You can auto generate the +Manifest.txt+ with +rake update_manifest+ but make sure to run +rake newb+ beforehand
 
 4. Don't modify the history file or version number.
 
