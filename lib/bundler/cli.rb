@@ -31,8 +31,14 @@ module Bundler
       Bundler::SharedHelpers.print_major_deprecations!
     end
 
+    class << self
+      attr_accessor :dispatched_command
+    end
+
     def self.dispatch(*)
       super do |i|
+        command = i.send(:current_command)
+        self.dispatched_command = command.name unless command.is_a?(Bundler::Thor::DynamicCommand)
         i.send(:print_command)
         i.send(:warn_on_outdated_bundler)
       end
@@ -186,6 +192,7 @@ module Bundler
 
     def self.handle_no_command_error(command, has_namespace = $thor_runner)
       if Bundler.settings[:plugins] && Bundler::Plugin.command?(command)
+        self.dispatched_command = command
         return Bundler::Plugin.exec_command(command, ARGV[1..-1])
       end
 

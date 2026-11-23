@@ -200,6 +200,34 @@ RSpec.describe Bundler::Fetcher do
       expect(options).to include("foo")
     end
 
+    describe "command" do
+      def command_part
+        fetcher.user_agent.split(" ").find {|x| x.start_with?("command/") }
+      end
+
+      it "includes the command Bundler::CLI dispatched" do
+        allow(Bundler::CLI).to receive(:dispatched_command).and_return("install")
+
+        expect(command_part).to eq("command/install")
+      end
+
+      it "omits ARGV when Bundler::CLI dispatched no command" do
+        allow(Bundler::CLI).to receive(:dispatched_command).and_return(nil)
+        stub_const("ARGV", ['{"params":{"workspaceFolders":[{"uri":"file:///d%3A/Work/repo"}]}}'])
+
+        expect(command_part).to eq("command/")
+        expect(fetcher.user_agent).not_to include("workspaceFolders")
+      end
+
+      it "does not load Bundler::CLI when Bundler is used as a library" do
+        allow(Bundler).to receive(:autoload?).and_call_original
+        allow(Bundler).to receive(:autoload?).with(:CLI).and_return("bundler/cli")
+        expect(Bundler::CLI).not_to receive(:dispatched_command)
+
+        expect(command_part).to eq("command/")
+      end
+    end
+
     describe "include CI information" do
       it "from one CI" do
         with_env_vars("CI" => nil, "JENKINS_URL" => "foo") do

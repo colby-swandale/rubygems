@@ -207,7 +207,7 @@ module Bundler
         agent << " rubygems/#{Gem::VERSION}"
         agent << " ruby/#{ruby.versions_string(ruby.versions)}"
         agent << " (#{ruby.host})"
-        agent << " command/#{ARGV.first}"
+        agent << " command/#{cli_command}"
 
         if ruby.engine != "ruby"
           # engine_version raises on unknown engines
@@ -296,6 +296,10 @@ module Bundler
 
     def cis
       @cis ||= Bundler::CIDetector.ci_strings
+    end
+
+    def cli_command
+      Bundler::CLI.dispatched_command unless Bundler.autoload?(:CLI)
     end
 
     def connection

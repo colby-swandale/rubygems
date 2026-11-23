@@ -21,4 +21,10 @@ RSpec.describe "fetching dependencies with a mirrored source" do
     expect(out).to include("Bundle complete")
     expect(the_bundle).to include_gems "weakling 0.0.3"
   end
+
+  it "reports the command an alias dispatches to in the 'User-Agent' header" do
+    bundle "i", artifice: "endpoint_mirror_source"
+
+    expect(the_bundle).to include_gems "weakling 0.0.3"
+  end
 end
